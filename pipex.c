@@ -34,6 +34,57 @@ void	ft_strdel(char **str)
 	}
 }
 
+void	free_array(char ***str)
+{
+	int	i;
+
+	i = 0;
+	if (!str)
+		return ;
+	while ((*str)[i])
+	{
+		ft_strdel(*str + i);
+		i++;
+	}
+	free(*str);
+	*str = NULL;
+}
+
+char		*search_path(char **paths, char *cmd)
+{
+	int				i;
+	char			*path;
+	char			*part_path;
+
+	i = 0;
+	while (paths[i] && cmd[1] != '/')
+	{
+		part_path = ft_strjoin(paths[i], "/");
+		path = ft_strjoin(part_path, cmd);
+		ft_strdel(&part_path);
+		if (access(path, F_OK) == 0)
+			return (path);
+		ft_strdel(&path);
+		i++;
+	}
+	if (cmd[0] == '/')
+		return ("");
+	if (access(cmd, F_OK) == 0)
+		return (cmd);
+	return (NULL);
+}
+
+char	*get_path(char **envp, char **cmd)
+{
+	char **paths;
+	char *path;
+
+	paths = ft_split(envp[0] + 5, ':');
+	path = search_path(paths, *cmd);
+	free_array(&paths);
+	return (path);
+}
+
 int	find_pwd_pos(char **src, char *to_find)
 {
 	int	i;
@@ -44,12 +95,14 @@ int	find_pwd_pos(char **src, char *to_find)
 	return (i);
 }
 
-void	open_file(char *filename, char **envp)
+void	open_file(char *filename, char **envp, char **av)
 {
 	int i = 0;
 	char *pwd;
 	char *path_to;
 	char *new_path;
+
+	char **cmd;
 
 	i = find_pwd_pos(envp, "PWD=");
 	pwd = envp[i] + 4;
@@ -57,14 +110,18 @@ void	open_file(char *filename, char **envp)
 	new_path = ft_strjoin(path_to, filename);
 	ft_strdel(&path_to);
 	if (check_path(new_path))
+	{
+		cmd = ft_split(av[2], ' ');
+		execve(get_path(envp, cmd), cmd, envp);
 		printf("Valid path !\n");
+	}
 
 	ft_strdel(&new_path);
 }
 
 int main(int ac, char **av, char **envp)
 {
-	open_file(av[1], envp);
+	open_file(av[1], envp, av);
 
 	return 0;
 }
