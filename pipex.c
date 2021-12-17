@@ -50,42 +50,57 @@ void	free_array(char ***str)
 	*str = NULL;
 }
 
-char		*search_path(char **paths, char *cmd)
+int	strsearch(char *str, char c)
 {
-	int				i;
-	char			*path;
-	char			*part_path;
+	int	i;
 
 	i = 0;
-	while (paths[i] && cmd[1] != '/')
+	while (str[i] && str[i] != c)
+		i++;
+	if (str[i] == c)
+		return (i);
+	return (-1);
+}
+
+char	*ft_strndup(char *src, int n)
+{
+	char *dest;
+	int i;
+
+	i = 0;
+	dest = (char *)malloc(sizeof(char) * (n + 1));
+	while (i < n)
 	{
-		part_path = ft_strjoin(paths[i], "/");
-		path = ft_strjoin(part_path, cmd);
-		ft_strdel(&part_path);
-		if (access(path, F_OK) == 0)
-			return (path);
-		ft_strdel(&path);
+		dest[i] = src[i];
 		i++;
 	}
-	if (cmd[0] == '/')
-		return ("");
-	if (access(cmd, F_OK) == 0)
-		return (cmd);
-	return (NULL);
+	dest[i] = '\0';
+	return (dest);
 }
 
-char	*get_path(char **envp, char **cmd)
+char	*create_path(char *path, char *cmd)
 {
-	char **paths;
-	char *path;
+	int i;
+	int j;
+	char *dest;
 
-	paths = ft_split(envp[0] + 5, ':');
-	path = search_path(paths, *cmd);
-	free_array(&paths);
-	return (path);
+	dest = (char *)malloc(sizeof(char) * (strsearch(path, 0) + strsearch(cmd, 0) + 2));
+	if (!dest)
+		return NULL;
+	i = -1;
+	while (path[++i])
+		dest[i] = path[i];
+	//securiser car '/' seulement si la commande est donne normalement
+	dest[i] = '/';
+	i++;
+	j = -1;
+	while (cmd[++j])
+		dest[i + j] = cmd[j];
+	dest[i + j] = '\0';
+	return (dest);
 }
 
-int	find_pwd_pos(char **src, char *to_find)
+int	find_in_env(char **src, char *to_find)
 {
 	int	i;
 
@@ -95,34 +110,98 @@ int	find_pwd_pos(char **src, char *to_find)
 	return (i);
 }
 
-void	open_file(char *filename, char **envp, char **av)
+char	*get_path(char *cmd, char **env)
 {
-	int i = 0;
-	char *pwd;
-	char *path_to;
-	char *new_path;
+	char *path;
+	char *dir;
+	char *bin;
+	int i;
 
-	char **cmd;
-
-	i = find_pwd_pos(envp, "PWD=");
-	pwd = envp[i] + 4;
-	path_to = ft_strjoin(pwd, "/");
-	new_path = ft_strjoin(path_to, filename);
-	ft_strdel(&path_to);
-	if (check_path(new_path))
+	i = 0;
+	i = find_in_env(env, "PATH=");
+	if (!env[i])
+		return (cmd);
+	path = env[i] + 5;
+	while (path && strsearch(path, ':') > -1)
 	{
-		cmd = ft_split(av[2], ' ');
-		execve(get_path(envp, cmd), cmd, envp);
-		printf("Valid path !\n");
+		dir = ft_strndup(path, strsearch(path, ':'));
+		bin = create_path(dir, cmd);
+		free(dir);
+		if (access(bin, F_OK) == 0)
+		{
+			// printf("returned BIN\n");
+			return (bin);
+		}
+		free(bin);
+		path += strsearch(path, ':') + 1;
 	}
-
-	ft_strdel(&new_path);
+	// printf("returned CMD\n");
+	return (cmd);
 }
 
-int main(int ac, char **av, char **envp)
-{
-	open_file(av[1], envp, av);
+// void	open_file(char *filename, char **env, char **av)
+// {
+// 	int i = 0;
+// 	char *pwd;
+// 	char *path_to;
+// 	char *new_path;
 
+// 	char **cmd;
+
+// 	i = find_in_env(env, "PWD=");
+// 	pwd = env[i] + 4;
+// 	path_to = ft_strjoin(pwd, "/");
+// 	new_path = ft_strjoin(path_to, filename);
+// 	ft_strdel(&path_to);
+// 	check_path(new_path);
+
+// 	printf("open file path : %s\n", new_path);
+// 	ft_strdel(&new_path);
+// }
+
+#define STDIN 0
+#define STDOUT 1
+#define STDERR 2
+
+int	open_file(char *file_name, int mode)
+{
+	if (mode == 0)
+	{
+		if (access(file_name, F_OK))
+		{
+			ft_putstr_fd("pipex: \n", 2);
+			write(2, file_name, strsearch(file_name, '\0'));
+			ft_putstr_fd(": No such file or directory\n", 2);
+			return (STDIN);
+		}
+		return (open(file_name, O_RDONLY));
+	}
+	else
+		return (open(file_name, O_CREAT | O_WRONLY | O_TRUNC | S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH));
+}
+
+void	exec (char *cmd, char **env)
+{
+	char	**args;
+	char	*path;
+
+	args = ft_split(cmd, ' ');
+	if (strsearch(args[0], '/') > -1)
+		path = args[0];
+	else
+		path = get_path(args[0], env);
+	execve(path, args, env);
+	write(2, "pipex: ", 7);
+	write(2, cmd, strsearch(cmd, 0));
+	write(2, ": command not found\n", 20);
+	// exit(127);
+}
+
+int main(int ac, char **av, char **env)
+{
+	// open_file(av[1], env, av);
+
+	exec(get_path(av[1], env), env);
 	return 0;
 }
 
