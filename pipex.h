@@ -22,4 +22,14 @@
 #include <stdio.h>
 #include "./libft/libft.h"
 
+# define STDIN 0
+# define STDOUT 1
+# define STDERR 2
+
+char	*get_path(char *cmd, char **env);
+char	*create_path(char *path, char *cmd);
+int		str_search(char *str, char c);
+int		find_in_env(char **src, char *to_find);
+char	*ft_strndup(char *src, int n);
+
 #endif

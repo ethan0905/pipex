@@ -13,6 +13,7 @@
 NAME = pipex
 
 SRCS = pipex.c \
+	get_path.c \
 	./libft/ft_strlen.c \
 	./libft/ft_strncmp.c \
 	./libft/ft_strjoin.c \
@@ -30,6 +31,4 @@ clean:
 fclean:
 	rm -f ${OBJS} ${NAME}
 
-re:
-	fclean
-	all
+re:	fclean all
