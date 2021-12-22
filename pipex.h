@@ -26,6 +26,9 @@
 # define STDOUT 1
 # define STDERR 2
 
+# define INFILE 0
+# define OUTFILE 1
+
 char	*get_path(char *cmd, char **env);
 char	*create_path(char *path, char *cmd);
 int		str_search(char *str, char c);
