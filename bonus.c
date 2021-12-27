@@ -6,7 +6,7 @@
 /*   By: esafar <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/27 17:36:15 by esafar            #+#    #+#             */
-/*   Updated: 2021/12/27 19:24:34 by esafar           ###   ########.fr       */
+/*   Updated: 2021/12/27 19:29:45 by esafar           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,12 +58,14 @@ void	proceed_processes(char *cmd, char **env, int fdin)
 	{
 		close(pipefd[1]);
 		dup2(pipefd[0], STDIN);
+		close(pipefd[0]);
 		waitpid(pid, NULL, 0);
 	}
 	else
 	{
 		close(pipefd[0]);
 		dup2(pipefd[1], STDOUT);
+		close(pipefd[1]);
 		if (fdin == STDIN)
 			exit(1);
 		else
