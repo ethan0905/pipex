@@ -6,7 +6,7 @@
 /*   By: esafar <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/27 17:36:15 by esafar            #+#    #+#             */
-/*   Updated: 2021/12/27 17:36:54 by esafar           ###   ########.fr       */
+/*   Updated: 2021/12/27 19:24:34 by esafar           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,7 @@ int	open_file(char *file_name, int mode)
 		return (open(file_name, O_RDONLY));
 	}
 	else if (mode == OUTFILE)
-		return (open(file_name, O_CREAT | O_WRONLY | O_TRUNC | \
-			S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH));
+		return (open(file_name, O_CREAT | O_WRONLY | O_TRUNC, 0644));
 	return (-1);
 }
 
