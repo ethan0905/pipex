@@ -1,9 +1,21 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_path.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: esafar <marvin@42.fr>                      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/12/27 14:51:20 by esafar            #+#    #+#             */
+/*   Updated: 2021/12/27 14:51:25 by esafar           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "pipex.h"
 
 char	*ft_strndup(char *src, int n)
 {
 	int		i;
-	char 	*dest;
+	char	*dest;
 
 	i = 0;
 	dest = (char *)malloc(sizeof(char) * (n + 1));
@@ -44,7 +56,8 @@ char	*create_path(char *path, char *cmd)
 	int		j;
 	char	*dest;
 
-	dest = (char *)malloc(sizeof(char) * str_search(path, '\0') + str_search(cmd, '\0') + 2);
+	dest = (char *)malloc(sizeof(char) * str_search(path, '\0') + \
+		str_search(cmd, '\0') + 2);
 	if (!dest)
 		return (NULL);
 	i = -1;

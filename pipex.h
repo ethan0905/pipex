@@ -13,14 +13,14 @@
 #ifndef PIPEX_H
 # define PIPEX_H
 
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include "./libft/libft.h"
+# include <sys/types.h>
+# include <sys/wait.h>
+# include <fcntl.h>
+# include <unistd.h>
+# include <string.h>
+# include <stdlib.h>
+# include <stdio.h>
+# include "./libft/libft.h"
 
 # define STDIN 0
 # define STDOUT 1

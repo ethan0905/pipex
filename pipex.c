@@ -26,7 +26,8 @@ int	open_file(char *file_name, int mode)
 		return (open(file_name, O_RDONLY));
 	}
 	else if (mode == OUTFILE)
-		return (open(file_name, O_CREAT | O_WRONLY | O_TRUNC | S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH));
+		return (open(file_name, O_CREAT | O_WRONLY | O_TRUNC | \
+			S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH));
 	return (-1);
 }
 
