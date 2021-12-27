@@ -2,5 +2,4 @@
 ## Subject
 Reproduce the behavior of pipes  
 
-##### read
-## 
+###### Read more [here](https://cdn.intra.42.fr/pdf/pdf/35191/fr.subject.pdf)
