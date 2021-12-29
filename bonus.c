@@ -6,7 +6,7 @@
 /*   By: esafar <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/27 17:36:15 by esafar            #+#    #+#             */
-/*   Updated: 2021/12/27 19:29:45 by esafar           ###   ########.fr       */
+/*   Updated: 2021/12/29 18:18:27 by esafar           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,23 @@ int	open_file(char *file_name, int mode)
 			ft_putstr_fd(": No such file or directory\n", STDERR);
 			return (STDIN);
 		}
+		else if (access(file_name, R_OK))
+		{
+			ft_putstr_fd("pipex: ", STDERR);
+			write(STDERR, file_name, str_search(file_name, '\0'));
+			ft_putstr_fd(": Wrong rights on file\n", STDERR);
+			return (STDIN);
+		}
 		return (open(file_name, O_RDONLY));
 	}
 	else if (mode == OUTFILE)
+		// if (access(file_name, W_OK))
+		// {
+		// 	ft_putstr_fd("pipex: ", STDERR);
+		// 	write(STDERR, file_name, str_search(file_name, '\0'));
+		// 	ft_putstr_fd(": Wrong rights on file\n", STDERR);
+		// 	exit(0);
+		// }
 		return (open(file_name, O_CREAT | O_WRONLY | O_TRUNC, 0644));
 	return (-1);
 }
@@ -73,6 +87,21 @@ void	proceed_processes(char *cmd, char **env, int fdin)
 	}
 }
 
+void	check_error(char *arg)
+{
+	int	i;
+
+	i = 0;
+	while (arg[i])
+		i++;
+	if (i == 0)
+	{
+		ft_putstr_fd("pipex: Command not found\n", 2);
+		exit(0);
+	}
+	return ;
+}
+
 int	main(int ac, char **av, char **env)
 {
 	int	i;
@@ -88,6 +117,7 @@ int	main(int ac, char **av, char **env)
 		dup2(fdout, STDOUT);
 		while (i < ac - 2)
 		{
+			check_error(av[i]);
 			if (i == 2)
 				proceed_processes(av[i++], env, fdin);
 			else
