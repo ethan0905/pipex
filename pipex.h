@@ -29,6 +29,13 @@
 # define INFILE 0
 # define OUTFILE 1
 
+typedef struct s_data
+{
+    int pipefd[2];
+    int fdin;
+    int fdout;
+}               t_data;
+
 char	*get_path(char *cmd, char **env);
 char	*create_path(char *path, char *cmd);
 int		str_search(char *str, char c);
