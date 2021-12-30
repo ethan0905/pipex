@@ -12,49 +12,26 @@
 
 #include "pipex.h"
 
-void	basic_exit(void)
-{
-	close(STDIN);
-	close(STDOUT);
-	close(STDERR);
-	exit(0);
-}
-
 int	open_file(char *file_name, int mode, t_data *data)
 {
 	if (mode == INFILE)
 	{
 		if (access(file_name, F_OK))
-		{
-			ft_putstr_fd("pipex: ", STDERR);
-			write(STDERR, file_name, str_search(file_name, '\0'));
-			ft_putstr_fd(": No such file or directory\n", STDERR);
-			basic_exit();
-		}
+			display_error(file_name, data, 1);
 		else if (access(file_name, R_OK))
-		{
-			ft_putstr_fd("pipex: ", STDERR);
-			write(STDERR, file_name, str_search(file_name, '\0'));
-			ft_putstr_fd(": Wrong rights on file\n", STDERR);
-			basic_exit();
-		}
+			display_error(file_name, data, 2);
 		return (open(file_name, O_RDONLY | O_TRUNC, 0644));
 	}
 	else if (mode == OUTFILE)
 	{
-		// if (access(file_name, W_OK))
-		// {
-		// 	ft_putstr_fd("pipex: ", STDERR);
-		// 	write(STDERR, file_name, str_search(file_name, '\0'));
-		// 	ft_putstr_fd(": Wrong rights on file\n", STDERR);
-		// 	exit(0);
-		// }
+		if (access(file_name, W_OK))
+			display_error(file_name, data, 3);
 		return (open(file_name, O_CREAT | O_WRONLY | O_TRUNC, 0644));
 	}
 	return (-1);
 }
 
-void	exec_cmd(char *cmd, char **env)
+void	exec_cmd(char *cmd, char **env, t_data *data)
 {
 	char	*path;
 	char	**args;
@@ -68,7 +45,10 @@ void	exec_cmd(char *cmd, char **env)
 	ft_putstr_fd("pipex: ", STDERR);
 	write(STDERR, cmd, str_search(cmd, '\0'));
 	ft_putstr_fd(": command not found\n", STDERR);
-	exit(127);
+	close(data->fdin);
+	close(data->fdout);
+	free_ft_split_array(args);
+	basic_exit();
 }
 
 void	proceed_processes(char *cmd, char **env, int fdin, t_data *data)
@@ -92,36 +72,17 @@ void	proceed_processes(char *cmd, char **env, int fdin, t_data *data)
 		if (fdin == STDIN)
 			exit(1);
 		else
-			exec_cmd(cmd, env);
-	}
-}
-
-void	check_error(char **av, int ac)
-{
-	int	i;
-
-	i = 1;
-	while (i + 1 < ac + 1)
-	{
-		int j = 0;
-		while (av[i][j] != '\0')
-			j++;
-		if (j == 0)
-		{
-			ft_putstr_fd("pipex: Invalid argument\n", 2);
-			basic_exit();
-		}
-		i++;
+			exec_cmd(cmd, env, data);
 	}
 }
 
 int	main(int ac, char **av, char **env)
 {
-	int	i;
-	t_data data;
+	int		i;
+	t_data	data;
 
 	i = 2;
-	check_error(av, ac);
+	check_args(av, ac);
 	if (ac == 5)
 	{
 		data.fdin = open_file(av[1], INFILE, &data);
@@ -135,14 +96,10 @@ int	main(int ac, char **av, char **env)
 			else
 				proceed_processes(av[i++], env, STDOUT, &data);
 		}
-		exec_cmd(av[i], env);
+		exec_cmd(av[i], env, &data);
 	}
 	else
 		ft_putstr_fd("Wrong number of arguments.\n", STDERR);
-	close(data.pipefd[0]);
-	close(data.pipefd[1]);
-	close(data.fdin);
-	close(data.fdout);
+	close_data_fds(&data);
 	return (0);
 }
-
