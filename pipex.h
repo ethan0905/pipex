@@ -31,10 +31,10 @@
 
 typedef struct s_data
 {
-    int pipefd[2];
-    int fdin;
-    int fdout;
-}               t_data;
+	int	pipefd[2];
+	int	fdin;
+	int	fdout;
+}				t_data;
 
 //get_path
 char	*get_path(char *cmd, char **env);
