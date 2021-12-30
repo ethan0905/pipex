@@ -12,6 +12,14 @@
 
 #include "pipex.h"
 
+void	basic_exit(void)
+{
+	close(STDIN);
+	close(STDOUT);
+	close(STDERR);
+	exit(0);
+}
+
 int	open_file(char *file_name, int mode, t_data *data)
 {
 	if (mode == INFILE)
@@ -21,20 +29,14 @@ int	open_file(char *file_name, int mode, t_data *data)
 			ft_putstr_fd("pipex: ", STDERR);
 			write(STDERR, file_name, str_search(file_name, '\0'));
 			ft_putstr_fd(": No such file or directory\n", STDERR);
-			close(STDIN);
-			close(STDOUT);
-			close(STDERR);
-			exit(0);
+			basic_exit();
 		}
 		else if (access(file_name, R_OK))
 		{
 			ft_putstr_fd("pipex: ", STDERR);
 			write(STDERR, file_name, str_search(file_name, '\0'));
 			ft_putstr_fd(": Wrong rights on file\n", STDERR);
-			close(STDIN);
-			close(STDOUT);
-			close(STDERR);
-			exit(0);
+			basic_exit();
 		}
 		return (open(file_name, O_RDONLY | O_TRUNC, 0644));
 	}
@@ -108,10 +110,7 @@ void	check_error(char **av, int ac)
 		if (j == 0)
 		{
 			ft_putstr_fd("pipex: Invalid argument\n", 2);
-			close(STDIN);
-			close(STDOUT);
-			close(STDERR);
-			exit(0);
+			basic_exit();
 		}
 		i++;
 	}
@@ -147,3 +146,4 @@ int	main(int ac, char **av, char **env)
 	close(data.fdout);
 	return (0);
 }
+
