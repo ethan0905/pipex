@@ -12,7 +12,7 @@
 
 #include "pipex.h"
 
-int	open_file(char *file_name, int mode)
+int	open_file(char *file_name, int mode, t_data *data)
 {
 	if (mode == INFILE)
 	{
@@ -21,14 +21,20 @@ int	open_file(char *file_name, int mode)
 			ft_putstr_fd("pipex: ", STDERR);
 			write(STDERR, file_name, str_search(file_name, '\0'));
 			ft_putstr_fd(": No such file or directory\n", STDERR);
-			return (STDIN);
+			close(STDIN);
+			close(STDOUT);
+			close(STDERR);
+			exit(0);
 		}
 		else if (access(file_name, R_OK))
 		{
 			ft_putstr_fd("pipex: ", STDERR);
 			write(STDERR, file_name, str_search(file_name, '\0'));
 			ft_putstr_fd(": Wrong rights on file\n", STDERR);
-			return (STDIN);
+			close(STDIN);
+			close(STDOUT);
+			close(STDERR);
+			exit(0);
 		}
 		return (open(file_name, O_RDONLY | O_TRUNC, 0644));
 	}
@@ -89,24 +95,26 @@ void	proceed_processes(char *cmd, char **env, int fdin, t_data *data)
 	}
 }
 
-void	check_error(char *arg, t_data *data)
+void	check_error(char **av, int ac)
 {
 	int	i;
 
-	i = 0;
-	while (arg[i])
-		i++;
-	if (i == 0)
+	i = 1;
+	while (i + 1 < ac + 1)
 	{
-		ft_putstr_fd("pipex: Command not found\n", 2);
-		close(data->fdin);
-		close(data->fdout);
-		close(STDIN);
-		close(STDOUT);
-		close(STDERR);
-		exit(0);
+		int j = 0;
+		while (av[i][j] != '\0')
+			j++;
+		if (j == 0)
+		{
+			ft_putstr_fd("pipex: Invalid argument\n", 2);
+			close(STDIN);
+			close(STDOUT);
+			close(STDERR);
+			exit(0);
+		}
+		i++;
 	}
-	return ;
 }
 
 int	main(int ac, char **av, char **env)
@@ -115,15 +123,15 @@ int	main(int ac, char **av, char **env)
 	t_data data;
 
 	i = 2;
+	check_error(av, ac);
 	if (ac == 5)
 	{
-		data.fdin = open_file(av[1], INFILE);
-		data.fdout = open_file(av[ac - 1], OUTFILE);
+		data.fdin = open_file(av[1], INFILE, &data);
+		data.fdout = open_file(av[ac - 1], OUTFILE, &data);
 		dup2(data.fdin, STDIN);
 		dup2(data.fdout, STDOUT);
 		while (i < ac - 2)
 		{
-			check_error(av[i], &data);
 			if (i == 2)
 				proceed_processes(av[i++], env, data.fdin, &data);
 			else
