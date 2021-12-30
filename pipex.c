@@ -77,7 +77,6 @@ void	proceed_processes(char *cmd, char **env, int fdin, t_data *data)
 
 	pipe(data->pipefd);
 	pid = fork();
-	printf("pid = %d", pid);
 	if (pid)
 	{
 		close(data->pipefd[1]);

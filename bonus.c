@@ -42,19 +42,20 @@ int	open_file(char *file_name, int mode, t_data *data)
 	}
 	else if (mode == OUTFILE)
 	{
-		// if (access(file_name, W_OK))
-		// {
-		// 	ft_putstr_fd("pipex: ", STDERR);
-		// 	write(STDERR, file_name, str_search(file_name, '\0'));
-		// 	ft_putstr_fd(": Wrong rights on file\n", STDERR);
-		// 	exit(0);
-		// }
+		if (access(file_name, W_OK))
+		{
+			ft_putstr_fd("pipex: ", STDERR);
+			write(STDERR, file_name, str_search(file_name, '\0'));
+			ft_putstr_fd(": Wrong rights on file\n", STDERR);
+			close(data->fdin);
+			basic_exit();
+		}
 		return (open(file_name, O_CREAT | O_WRONLY | O_TRUNC, 0644));
 	}
 	return (-1);
 }
 
-void	exec_cmd(char *cmd, char **env)
+void	exec_cmd(char *cmd, char **env, t_data *data)
 {
 	char	*path;
 	char	**args;
@@ -68,6 +69,16 @@ void	exec_cmd(char *cmd, char **env)
 	ft_putstr_fd("pipex: ", STDERR);
 	write(STDERR, cmd, str_search(cmd, '\0'));
 	ft_putstr_fd(": command not found\n", STDERR);
+	close(data->fdin);
+	close(data->fdout);
+	int i = 0;
+	while (args[i])
+	{
+		free(args[i]);
+		i++;
+	}
+	free(args);
+	basic_exit();
 	exit(127);
 }
 
@@ -77,7 +88,6 @@ void	proceed_processes(char *cmd, char **env, int fdin, t_data *data)
 
 	pipe(data->pipefd);
 	pid = fork();
-	printf("pid = %d", pid);
 	if (pid)
 	{
 		close(data->pipefd[1]);
@@ -93,7 +103,7 @@ void	proceed_processes(char *cmd, char **env, int fdin, t_data *data)
 		if (fdin == STDIN)
 			exit(1);
 		else
-			exec_cmd(cmd, env);
+			exec_cmd(cmd, env, data);
 	}
 }
 
@@ -136,7 +146,7 @@ int	main(int ac, char **av, char **env)
 			else
 				proceed_processes(av[i++], env, STDOUT, &data);
 		}
-		exec_cmd(av[i], env);
+		exec_cmd(av[i], env, &data);
 	}
 	else
 		ft_putstr_fd("Wrong number of arguments.\n", STDERR);
