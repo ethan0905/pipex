@@ -20,36 +20,44 @@ void	basic_exit(void)
 	exit(0);
 }
 
+void	display_error(char *file_name, t_data *data, int event)
+{
+	if (event == 1)
+	{
+		ft_putstr_fd("pipex: ", STDERR);
+		write(STDERR, file_name, str_search(file_name, '\0'));
+		ft_putstr_fd(": No such file or directory\n", STDERR);
+	}
+	else if (event == 2)
+	{
+		ft_putstr_fd("pipex: ", STDERR);
+		write(STDERR, file_name, str_search(file_name, '\0'));
+		ft_putstr_fd(": Wrong rights on file\n", STDERR);
+	}
+	else if (event == 3)
+	{
+		ft_putstr_fd("pipex: ", STDERR);
+		write(STDERR, file_name, str_search(file_name, '\0'));
+		ft_putstr_fd(": Wrong rights on file\n", STDERR);
+		close(data->fdin);
+	}
+	basic_exit();
+}
+
 int	open_file(char *file_name, int mode, t_data *data)
 {
 	if (mode == INFILE)
 	{
 		if (access(file_name, F_OK))
-		{
-			ft_putstr_fd("pipex: ", STDERR);
-			write(STDERR, file_name, str_search(file_name, '\0'));
-			ft_putstr_fd(": No such file or directory\n", STDERR);
-			basic_exit();
-		}
+			display_error(file_name, data, 1);
 		else if (access(file_name, R_OK))
-		{
-			ft_putstr_fd("pipex: ", STDERR);
-			write(STDERR, file_name, str_search(file_name, '\0'));
-			ft_putstr_fd(": Wrong rights on file\n", STDERR);
-			basic_exit();
-		}
+			display_error(file_name, data, 2);
 		return (open(file_name, O_RDONLY | O_TRUNC, 0644));
 	}
 	else if (mode == OUTFILE)
 	{
 		if (access(file_name, W_OK))
-		{
-			ft_putstr_fd("pipex: ", STDERR);
-			write(STDERR, file_name, str_search(file_name, '\0'));
-			ft_putstr_fd(": Wrong rights on file\n", STDERR);
-			close(data->fdin);
-			basic_exit();
-		}
+			display_error(file_name, data, 3);
 		return (open(file_name, O_CREAT | O_WRONLY | O_TRUNC, 0644));
 	}
 	return (-1);
@@ -79,7 +87,6 @@ void	exec_cmd(char *cmd, char **env, t_data *data)
 	}
 	free(args);
 	basic_exit();
-	exit(127);
 }
 
 void	proceed_processes(char *cmd, char **env, int fdin, t_data *data)
