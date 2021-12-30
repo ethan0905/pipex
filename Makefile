@@ -16,6 +16,8 @@ BONUS = bonus
 
 SRCS = pipex.c \
 	get_path.c \
+	exit.c \
+	error.c \
 	./libft/ft_strlen.c \
 	./libft/ft_strncmp.c \
 	./libft/ft_strjoin.c \
@@ -24,6 +26,8 @@ SRCS = pipex.c \
 
 SRCS_B = bonus.c \
 	get_path.c \
+	exit.c \
+	error.c \
 	./libft/ft_strlen.c \
 	./libft/ft_strncmp.c \
 	./libft/ft_strjoin.c \

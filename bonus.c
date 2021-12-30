@@ -12,38 +12,6 @@
 
 #include "pipex.h"
 
-void	basic_exit(void)
-{
-	close(STDIN);
-	close(STDOUT);
-	close(STDERR);
-	exit(0);
-}
-
-void	display_error(char *file_name, t_data *data, int event)
-{
-	if (event == 1)
-	{
-		ft_putstr_fd("pipex: ", STDERR);
-		write(STDERR, file_name, str_search(file_name, '\0'));
-		ft_putstr_fd(": No such file or directory\n", STDERR);
-	}
-	else if (event == 2)
-	{
-		ft_putstr_fd("pipex: ", STDERR);
-		write(STDERR, file_name, str_search(file_name, '\0'));
-		ft_putstr_fd(": Wrong rights on file\n", STDERR);
-	}
-	else if (event == 3)
-	{
-		ft_putstr_fd("pipex: ", STDERR);
-		write(STDERR, file_name, str_search(file_name, '\0'));
-		ft_putstr_fd(": Wrong rights on file\n", STDERR);
-		close(data->fdin);
-	}
-	basic_exit();
-}
-
 int	open_file(char *file_name, int mode, t_data *data)
 {
 	if (mode == INFILE)
@@ -79,13 +47,7 @@ void	exec_cmd(char *cmd, char **env, t_data *data)
 	ft_putstr_fd(": command not found\n", STDERR);
 	close(data->fdin);
 	close(data->fdout);
-	int i = 0;
-	while (args[i])
-	{
-		free(args[i]);
-		i++;
-	}
-	free(args);
+	free_ft_split_array(args);
 	basic_exit();
 }
 
@@ -114,32 +76,13 @@ void	proceed_processes(char *cmd, char **env, int fdin, t_data *data)
 	}
 }
 
-void	check_error(char **av, int ac)
-{
-	int	i;
-
-	i = 1;
-	while (i + 1 < ac + 1)
-	{
-		int j = 0;
-		while (av[i][j] != '\0')
-			j++;
-		if (j == 0)
-		{
-			ft_putstr_fd("pipex: Invalid argument\n", 2);
-			basic_exit();
-		}
-		i++;
-	}
-}
-
 int	main(int ac, char **av, char **env)
 {
-	int	i;
-	t_data data;
+	int		i;
+	t_data	data;
 
 	i = 2;
-	check_error(av, ac);
+	check_args(av, ac);
 	if (ac >= 5)
 	{
 		data.fdin = open_file(av[1], INFILE, &data);
@@ -157,9 +100,6 @@ int	main(int ac, char **av, char **env)
 	}
 	else
 		ft_putstr_fd("Wrong number of arguments.\n", STDERR);
-	close(data.pipefd[0]);
-	close(data.pipefd[1]);
-	close(data.fdin);
-	close(data.fdout);
+	close_data_fds(&data);
 	return (0);
 }

@@ -36,10 +36,20 @@ typedef struct s_data
     int fdout;
 }               t_data;
 
+//get_path
 char	*get_path(char *cmd, char **env);
 char	*create_path(char *path, char *cmd);
 int		str_search(char *str, char c);
 int		find_in_env(char **src, char *to_find);
 char	*ft_strndup(char *src, int n);
+
+//exit
+void	free_ft_split_array(char **args);
+void	display_error(char *file_name, t_data *data, int event);
+void	close_data_fds(t_data *data);
+void	basic_exit(void);
+
+//error
+void	check_args(char **av, int ac);
 
 #endif
