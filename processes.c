@@ -24,7 +24,7 @@ int	open_file(char *file_name, int mode, t_data *data)
 	}
 	else if (mode == OUTFILE)
 	{
-		if (access(file_name, W_OK))
+		if (access(file_name, W_OK) && access(file_name, F_OK) == 0)
 			display_error(file_name, data, 3);
 		return (open(file_name, O_CREAT | O_WRONLY | O_TRUNC, 0644));
 	}
