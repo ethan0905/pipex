@@ -78,7 +78,6 @@ void	proceed_processes(char *cmd, char **env, int fdin, t_data *data)
 
 void	here_doc(char *av, t_data *data)
 {
-	// int		file;
 	char	*buf;
 
 	data->file = open(".heredoc_tmp", O_CREAT | O_WRONLY | O_TRUNC, 0644);
@@ -105,36 +104,42 @@ void	here_doc(char *av, t_data *data)
 	}
 }
 
+void	start_piping(int ac, char **av, char **env, t_data *data)
+{
+	dup2(data->fdin, STDIN);
+	dup2(data->fdout, STDOUT);
+	if (data->heredoc)
+		data->i = 3;
+	else
+		data->i = 2;
+	while (data->i < ac - 2)
+	{
+		if (data->i == 2)
+			proceed_processes(av[data->i++], env, data->fdin, data);
+		else
+			proceed_processes(av[data->i++], env, STDOUT, data);
+	}
+	exec_cmd(av[data->i], env, data);
+}
+
 int	main(int ac, char **av, char **env)
 {
 	t_data	data;
 
-	data.i = 2;
+	data.heredoc = 0;
 	check_args(av, ac);
 	if (ac >= 5 && strncmp(av[1], "here_doc", 8) == 0)
 	{
-		if (strncmp(av[1], "here_doc", 8) == 0)
-		{
-			here_doc(av[2], &data);
-			data.i++;
-		}
-		else
-			data.fdin = open_file(av[1], INFILE, &data);
+		here_doc(av[2], &data);
 		data.fdout = open_file(av[ac - 1], OUTFILE, &data);
-		dup2(data.fdin, STDIN);
-		dup2(data.fdout, STDOUT);
-		while (data.i < ac - 2)
-		{
-			if (data.i == 2)
-				proceed_processes(av[data.i++], env, data.fdin, &data);
-			else
-				proceed_processes(av[data.i++], env, STDOUT, &data);
-		}
-		exec_cmd(av[data.i], env, &data);
+		data.heredoc = 1;
+		start_piping(ac, av, env, &data);
 	}
 	else if (ac >= 5 && strncmp(av[1], "here_doc", 8) != 0)
 	{
-		
+		data.fdin = open_file(av[1], INFILE, &data);
+		data.fdout = open_file(av[ac - 1], OUTFILE, &data);
+		start_piping(ac, av, env, &data);
 	}
 	else
 		ft_putstr_fd("Wrong number of arguments.\n", STDERR);

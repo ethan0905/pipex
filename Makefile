@@ -38,12 +38,12 @@ OBJS_B = ${SRCS_B:.c=.o}
 OBJS_L = ${LIBFT:.c=.o}
 OBJS_G = ${GNL:.c=.o}
 
-all: ${OBJS}
+all: ${OBJS} ${OBJS_L}
 	clang ${OBJS} ${OBJS_L} -o ${NAME}
 
 .c.o:
 
-bonus:	${OBJS_B} ${OBJS_G}
+bonus:	${OBJS_B} ${OBJS_G} ${OBJS_L}
 	clang ${OBJS_B} ${OBJS_L} ${OBJS_G} -o ${BONUS}
 
 clean:

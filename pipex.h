@@ -39,6 +39,7 @@ typedef struct s_data
 	int	fdout;
 	int i;
 	int file;
+	int	heredoc;
 }				t_data;
 
 //get_path
