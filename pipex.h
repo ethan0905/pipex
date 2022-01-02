@@ -21,6 +21,7 @@
 # include <stdlib.h>
 # include <stdio.h>
 # include "./libft/libft.h"
+# include "./get_next_line/get_next_line.h"
 
 # define STDIN 0
 # define STDOUT 1
@@ -29,11 +30,15 @@
 # define INFILE 0
 # define OUTFILE 1
 
+# define BUFFER_SIZE 1
+
 typedef struct s_data
 {
 	int	pipefd[2];
 	int	fdin;
 	int	fdout;
+	int i;
+	int file;
 }				t_data;
 
 //get_path

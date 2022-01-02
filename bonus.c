@@ -76,28 +76,63 @@ void	proceed_processes(char *cmd, char **env, int fdin, t_data *data)
 	}
 }
 
+void	here_doc(char *av, t_data *data)
+{
+	// int		file;
+	char	*buf;
+
+	data->file = open(".heredoc_tmp", O_CREAT | O_WRONLY | O_TRUNC, 0644);
+	if (data->file < 0)
+		exit(0);
+	while (1)
+	{
+		write(1, "> ", 2);
+		if (get_next_line(0, &buf) < 0)
+			exit(0);
+		if (!ft_strncmp(av, buf, ft_strlen(av) + 1))
+			break ;
+		write(data->file, buf, ft_strlen(buf));
+		write(data->file, "\n", 1);
+		free(buf);
+	}
+	free(buf);
+	close(data->file);
+	data->fdin = open(".heredoc_tmp", O_RDONLY);
+	if (data->fdin < 0)
+	{
+		unlink(".heredoc_tmp");
+		exit(0);
+	}
+}
+
 int	main(int ac, char **av, char **env)
 {
-	int		i;
 	t_data	data;
 
-	i = 2;
+	data.i = 2;
 	check_args(av, ac);
-	if (ac >= 5)
+	if (ac >= 5 && strncmp(av[1], "here_doc", 8) == 0)
 	{
-		data.fdin = open_file(av[1], INFILE, &data);
+		if (strncmp(av[1], "here_doc", 8) == 0)
+		{
+			here_doc(av[2], &data);
+			data.i++;
+		}
+		else
+			data.fdin = open_file(av[1], INFILE, &data);
 		data.fdout = open_file(av[ac - 1], OUTFILE, &data);
 		dup2(data.fdin, STDIN);
 		dup2(data.fdout, STDOUT);
-		while (i < ac - 2)
+		while (data.i < ac - 2)
 		{
-			if (i == 2)
-				proceed_processes(av[i++], env, data.fdin, &data);
+			if (data.i == 2)
+				proceed_processes(av[data.i++], env, data.fdin, &data);
 			else
-				proceed_processes(av[i++], env, STDOUT, &data);
+				proceed_processes(av[data.i++], env, STDOUT, &data);
 		}
-		exec_cmd(av[i], env, &data);
+		exec_cmd(av[data.i], env, &data);
 	}
+	else if (ac >= 5 && strncmp(av[1], "here_doc", 8) != 0)
 	else
 		ft_putstr_fd("Wrong number of arguments.\n", STDERR);
 	close_data_fds(&data);

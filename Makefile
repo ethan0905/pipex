@@ -17,36 +17,39 @@ BONUS = bonus
 SRCS = pipex.c \
 	get_path.c \
 	exit.c \
-	error.c \
-	./libft/ft_strlen.c \
-	./libft/ft_strncmp.c \
-	./libft/ft_strjoin.c \
-	./libft/ft_putstr_fd.c \
-	./libft/ft_split.c
+	error.c
 
 SRCS_B = bonus.c \
 	get_path.c \
 	exit.c \
 	error.c \
-	./libft/ft_strlen.c \
+
+LIBFT = ./libft/ft_strlen.c \
 	./libft/ft_strncmp.c \
 	./libft/ft_strjoin.c \
 	./libft/ft_putstr_fd.c \
 	./libft/ft_split.c
 
+GNL = 	./get_next_line/get_next_line.c \
+	./get_next_line/get_next_line_utils.c
+
 OBJS = ${SRCS:.c=.o}
 OBJS_B = ${SRCS_B:.c=.o}
+OBJS_L = ${LIBFT:.c=.o}
+OBJS_G = ${GNL:.c=.o}
 
 all: ${OBJS}
-	gcc ${OBJS} -o ${NAME}
+	clang ${OBJS} ${OBJS_L} -o ${NAME}
 
-bonus:	${OBJS_B}
-	gcc ${OBJS_B} -o ${BONUS}
+.c.o:
+
+bonus:	${OBJS_B} ${OBJS_G}
+	clang ${OBJS_B} ${OBJS_L} ${OBJS_G} -o ${BONUS}
 
 clean:
-	rm -f ${OBJS} ${OBJS_B}
+	rm -f ${OBJS} ${OBJS_B} ${OBJS_L} ${OBJS_G}
 
 fclean:
-	rm -f ${OBJS} ${OBJS_B} ${NAME} ${BONUS}
+	rm -f ${OBJS} ${OBJS_B} ${OBJS_L} ${OBJS_G} ${NAME} ${BONUS}
 
 re:	fclean all
