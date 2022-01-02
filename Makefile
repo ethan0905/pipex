@@ -40,10 +40,10 @@ OBJS_B = ${SRCS_B:.c=.o}
 OBJS_L = ${LIBFT:.c=.o}
 OBJS_G = ${GNL:.c=.o}
 
-all: ${OBJS} ${OBJS_L}
-	clang ${OBJS} ${OBJS_L} -o ${NAME}
+all: ${NAME}
 
-.c.o:
+${NAME}: ${OBJS} ${OBJS_L}
+	clang -Werror -Wall -Wextra ${OBJS} ${OBJS_L} -I includes -o ${NAME}
 
 bonus:	${OBJS_B} ${OBJS_G} ${OBJS_L}
 	clang ${OBJS_B} ${OBJS_L} ${OBJS_G} -o ${BONUS}
