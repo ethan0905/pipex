@@ -37,8 +37,8 @@ typedef struct s_data
 	int	pipefd[2];
 	int	fdin;
 	int	fdout;
-	int i;
-	int file;
+	int	i;
+	int	file;
 	int	heredoc;
 }				t_data;
 
