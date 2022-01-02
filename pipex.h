@@ -49,6 +49,11 @@ int		str_search(char *str, char c);
 int		find_in_env(char **src, char *to_find);
 char	*ft_strndup(char *src, int n);
 
+//processes
+void	proceed_processes(char *cmd, char **env, int fdin, t_data *data);
+void	exec_cmd(char *cmd, char **env, t_data *data);
+int		open_file(char *file_name, int mode, t_data *data);
+
 //exit
 void	free_ft_split_array(char **args);
 void	display_error(char *file_name, t_data *data, int event);

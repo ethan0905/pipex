@@ -17,12 +17,14 @@ BONUS = bonus
 SRCS = pipex.c \
 	get_path.c \
 	exit.c \
-	error.c
+	error.c \
+	processes.c
 
 SRCS_B = bonus.c \
 	get_path.c \
 	exit.c \
 	error.c \
+	processes.c
 
 LIBFT = ./libft/ft_strlen.c \
 	./libft/ft_strncmp.c \
