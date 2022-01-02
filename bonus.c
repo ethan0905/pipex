@@ -133,6 +133,9 @@ int	main(int ac, char **av, char **env)
 		exec_cmd(av[data.i], env, &data);
 	}
 	else if (ac >= 5 && strncmp(av[1], "here_doc", 8) != 0)
+	{
+		
+	}
 	else
 		ft_putstr_fd("Wrong number of arguments.\n", STDERR);
 	close_data_fds(&data);
