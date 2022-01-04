@@ -67,8 +67,8 @@ int	main(int ac, char **av, char **env)
 	if (ac >= 5 && strncmp(av[1], "here_doc", 8) == 0)
 	{
 		here_doc(av[2], &data);
-		data.fdout = open_file(av[ac - 1], OUTFILE, &data);
 		data.heredoc = 1;
+		data.fdout = open_file(av[ac - 1], OUTFILE, &data);
 		start_piping(ac, av, env, &data);
 	}
 	else if (ac >= 5 && strncmp(av[1], "here_doc", 8) != 0)

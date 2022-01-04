@@ -20,13 +20,16 @@ int	open_file(char *file_name, int mode, t_data *data)
 			display_error(file_name, data, 1);
 		else if (access(file_name, R_OK))
 			display_error(file_name, data, 2);
-		return (open(file_name, O_RDONLY | O_TRUNC, 0644));
+		return (open(file_name, O_RDONLY, 0644));
 	}
 	else if (mode == OUTFILE)
 	{
 		if (access(file_name, W_OK) && access(file_name, F_OK) == 0)
 			display_error(file_name, data, 3);
-		return (open(file_name, O_CREAT | O_WRONLY | O_TRUNC, 0644));
+		if (data->heredoc == 1)
+			return (open(file_name, O_CREAT | O_WRONLY | O_APPEND, 0644));
+		else if (data->heredoc == 0)
+			return (open(file_name, O_CREAT | O_WRONLY | O_TRUNC, 0644));
 	}
 	return (-1);
 }

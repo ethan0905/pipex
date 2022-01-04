@@ -17,6 +17,7 @@ int	main(int ac, char **av, char **env)
 	t_data	data;
 
 	data.i = 2;
+	data.heredoc = 0;
 	check_args(av, ac);
 	if (ac == 5)
 	{
